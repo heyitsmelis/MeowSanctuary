@@ -2,5 +2,7 @@
 {
     public class ShelterDTO
     {
+        public string Name { get; set; }
+        public string Address { get; set; }
     }
 }
