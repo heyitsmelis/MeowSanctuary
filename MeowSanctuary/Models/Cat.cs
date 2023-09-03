@@ -4,6 +4,7 @@ namespace MeowSanctuary.Models
 {
     public class Cat : BaseEntity
     {
+
         public string Name { get; set; }
         public int Age { get; set; }
         public string Breed { get; set; }

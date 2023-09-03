@@ -8,17 +8,18 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using MeowSanctuary.Repositories;
+using MeowSanctuary.Repositories.UnitOfWork;
 
 namespace MeowSanctuary.Services
 {
     public class AuthenticationService
     {
-        private readonly IUserRepository _userrepo;
+        private readonly IUnitOfWork _unitofwork;
         private readonly IConfiguration _configuration;
 
-        public AuthenticationService(IUserRepository userrepo, IConfiguration configuration)
+        public AuthenticationService(IUnitOfWork unitofwork, IConfiguration configuration)
         {
-            _userrepo = userrepo;
+            _unitofwork = unitofwork;
             _configuration = configuration;
         }
         public async Task<Token?> Authenticate(UserLoginDTO? user)
@@ -29,7 +30,7 @@ namespace MeowSanctuary.Services
                 throw new Exception("You must provide an email and password");
             }
 
-            var userInDb = await _userrepo.GetUserByEmail(user.Email);
+            var userInDb = await _unitofwork.Users.GetUserByEmail(user.Email);
             if (userInDb == null)
             {
                 throw new Exception("User doesn't exist");
@@ -43,7 +44,7 @@ namespace MeowSanctuary.Services
             }
             else return null;
 
-            userInDb = await _userrepo.GetUserByEmailAndHashedPassword(user.Email, hashedPassword);
+            userInDb = await _unitofwork.Users.GetUserByEmailAndHashedPassword(user.Email, hashedPassword);
 
             if (userInDb == null)
             {
@@ -85,7 +86,7 @@ namespace MeowSanctuary.Services
                 throw new Exception("Role must be admin or user");
             }
 
-            var userInDb = await _userrepo.GetUserByEmail(user.Email);
+            var userInDb = await _unitofwork.Users.GetUserByEmail(user.Email);
 
             if (userInDb != null)
             {
@@ -128,7 +129,7 @@ namespace MeowSanctuary.Services
 
         public object GetById(int userId)
         {
-            var user = _userrepo.GetById(userId);
+            var user = _unitofwork.Users.GetById(userId);
             if (user == null)
             {
                 return null;
